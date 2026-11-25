@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pet Survivors · Presentación</title>
+<meta name="description" content="Veterinaria 2D: proyecto final de Tecnología de Objetos. Arquitectura MVC, patrones de diseño, combate y catálogo de casos en C++17.">
+<meta property="og:title" content="Pet Survivors · Veterinaria 2D">
+<meta property="og:description" content="Proyecto final de Teoría de Objetos en C++17 con raylib.">
+<meta property="og:image" content="assets/fondo_inicio.png">
+<meta name="theme-color" content="#0d171b">
+<link rel="icon" href="assets/mora.png">
+<style>
+@font-face { font-family: "Pixelify Sans"; src: url("assets/fuentes/PixelifySans.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "Handjet"; src: url("assets/fuentes/Handjet.ttf") format("truetype"); font-display: swap; }
+
+:root {
+  --noche: #0d171b;
+  --petroleo: #16323b;
+  --petroleo-claro: #234855;
+  --ladrillo: #b5483a;
+  --ladrillo-claro: #d0654f;
+  --crema: #f1e4c8;
+  --crema-suave: #c9bfa8;
+  --menta: #7fd1ae;
+  --ambar: #f0c46a;
+  --borde: rgba(241, 228, 200, 0.14);
+  --titulo: "Pixelify Sans", ui-monospace, monospace;
+  --etiqueta: "Handjet", ui-monospace, monospace;
+  --cuerpo: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --codigo: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+body { background: var(--noche); color: var(--crema); font-family: var(--cuerpo); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+img { image-rendering: pixelated; display: block; }
+a { color: var(--menta); }
+code { font-family: var(--codigo); font-size: 0.88em; background: rgba(127, 209, 174, 0.1); color: var(--menta); padding: 0.08em 0.35em; border-radius: 3px; }
+
+/* ---------- Diapositivas ---------- */
+.diapositiva {
+  min-height: 100vh; min-height: 100svh;
+  scroll-snap-align: start;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(56px, 8vh, 96px) clamp(16px, 6vw, 96px);
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--borde);
+}
+.contenido { width: 100%; max-width: 1120px; margin: 0 auto; position: relative; z-index: 1; }
+.seccion {
+  font-family: var(--etiqueta); font-size: 1.35rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ladrillo-claro); display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;
+}
+.seccion::before { content: ""; width: 10px; height: 10px; background: var(--ladrillo); }
+h1, h2, h3 { font-family: var(--titulo); font-weight: 400; line-height: 1.15; }
+h2 { font-size: clamp(2rem, 4.6vw, 3.3rem); margin-bottom: 1rem; }
+h3 { font-size: 1.3rem; margin-bottom: 0.4rem; }
+.entrada { font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--crema-suave); max-width: 64ch; margin-bottom: 2rem; }
+.entrada strong { color: var(--crema); font-weight: 600; }
+
+.rejilla { display: grid; gap: 1rem; }
+.rejilla > *, .uml-lado > *, .mvc > * { min-width: 0; }
+.r2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.r3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.r5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.tarjeta {
+  background: linear-gradient(180deg, rgba(35, 72, 85, 0.55), rgba(22, 50, 59, 0.55));
+  border: 1px solid var(--borde); border-radius: 6px; padding: 1.15rem 1.2rem;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+}
+.tarjeta p, .tarjeta li { color: var(--crema-suave); font-size: 0.97rem; }
+.tarjeta ul { list-style: none; display: grid; gap: 0.35rem; margin-top: 0.4rem; }
+.tarjeta li::before { content: "▸ "; color: var(--menta); }
+.tarjeta.mia { border-color: rgba(127, 209, 174, 0.55); box-shadow: 0 4px 0 rgba(127, 209, 174, 0.18); }
+.etiqueta {
+  font-family: var(--etiqueta); font-size: 1.05rem; letter-spacing: 0.06em;
+  display: inline-block; padding: 0 0.5rem; border-radius: 3px; margin-bottom: 0.5rem;
+  background: rgba(181, 72, 58, 0.2); color: var(--ladrillo-claro);
+}
+.etiqueta.menta { background: rgba(127, 209, 174, 0.15); color: var(--menta); }
+.etiqueta.ambar { background: rgba(240, 196, 106, 0.15); color: var(--ambar); }
+
+/* ---------- Portada ---------- */
+.portada { justify-content: flex-end; padding-bottom: clamp(48px, 10vh, 110px); }
+.portada .fondo { position: absolute; inset: 0; background: url("assets/fondo_inicio.png") center / cover no-repeat; image-rendering: pixelated; }
+.portada .fondo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(13, 23, 27, 0.92) 0%, rgba(13, 23, 27, 0.55) 55%, rgba(13, 23, 27, 0.15) 100%), linear-gradient(0deg, var(--noche) 0%, transparent 35%); }
+.titulo-juego { width: min(560px, 88vw); height: auto; margin-bottom: 1.2rem; filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.45)); }
+.portada .lema { font-size: clamp(1.1rem, 2vw, 1.45rem); max-width: 40ch; color: var(--crema); margin-bottom: 1.6rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip { font-family: var(--etiqueta); font-size: 1.1rem; letter-spacing: 0.05em; border: 1px solid var(--borde); background: rgba(13, 23, 27, 0.6); padding: 0.1rem 0.7rem; border-radius: 3px; }
+.pista { position: absolute; right: clamp(16px, 4vw, 48px); bottom: 24px; z-index: 1; font-family: var(--etiqueta); font-size: 1.1rem; color: var(--crema-suave); display: flex; align-items: center; gap: 0.5rem; }
+.tecla { border: 1px solid var(--crema-suave); border-bottom-width: 3px; border-radius: 4px; padding: 0 0.4rem; font-size: 1rem; }
+
+/* ---------- Ciclo de juego ---------- */
+.ciclo { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.6rem; margin-bottom: 1.3rem; }
+.paso { position: relative; padding: 1rem 0.9rem; border-radius: 6px; border: 1px solid var(--borde); background: rgba(22, 50, 59, 0.7); }
+.paso .num { font-family: var(--titulo); font-size: 1.8rem; color: var(--ambar); line-height: 1; }
+.paso h3 { font-size: 1.05rem; margin: 0.4rem 0 0.25rem; }
+.paso p { font-size: 0.88rem; color: var(--crema-suave); }
+.paso.mision { background: rgba(181, 72, 58, 0.18); border-color: rgba(208, 101, 79, 0.45); }
+.reintento { font-size: 0.97rem; color: var(--crema-suave); border-left: 3px solid var(--ladrillo); padding-left: 0.9rem; }
+
+/* ---------- Casos ---------- */
+.escena { position: relative; border-radius: 6px; overflow: hidden; border: 1px solid var(--borde); aspect-ratio: 16 / 9; background: url("assets/fondo_clinica.png") center / cover; image-rendering: pixelated; }
+.escena .personajes { position: absolute; left: 0; right: 0; bottom: 8%; display: flex; justify-content: center; align-items: flex-end; gap: 4%; }
+.escena .dueno { width: 22%; height: auto; }
+.escena .mascota { width: 15%; height: auto; }
+.caso h3 { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.9rem; }
+.suministro { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--etiqueta); font-size: 1.1rem; background: rgba(127, 209, 174, 0.12); color: var(--menta); border-radius: 3px; padding: 0 0.5rem 0 0.3rem; }
+.suministro img { width: 20px; height: 20px; }
+.suministros { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+.dialogo { margin-top: 0.7rem; font-size: 0.95rem; color: var(--crema-suave); border-left: 3px solid var(--petroleo-claro); padding-left: 0.7rem; font-style: italic; }
+
+/* ---------- MVC ---------- */
+.mvc { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 0.6rem; align-items: stretch; }
+.flecha { align-self: center; font-family: var(--titulo); color: var(--ambar); font-size: 1.6rem; text-align: center; }
+.flecha small { display: block; font-family: var(--etiqueta); font-size: 0.95rem; color: var(--crema-suave); }
+
+/* ---------- Roles ---------- */
+.rol .numero { font-family: var(--titulo); font-size: 2.2rem; line-height: 1; color: var(--petroleo-claro); -webkit-text-stroke: 1px var(--crema-suave); }
+.rol.mia .numero { color: rgba(127, 209, 174, 0.25); -webkit-text-stroke-color: var(--menta); }
+.rol h3 { font-size: 1.1rem; margin-top: 0.5rem; }
+.rol .quien { font-family: var(--etiqueta); font-size: 1.15rem; color: var(--ambar); margin: 0.2rem 0 0.4rem; }
+.nota { margin-top: 1rem; font-size: 0.9rem; color: var(--crema-suave); }
+
+/* ---------- Patrones ---------- */
+.patron h3 { color: var(--ambar); }
+.patron .clases { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+/* ---------- Bucle de combate ---------- */
+.bucle { counter-reset: paso; display: grid; gap: 0.45rem; }
+.bucle li { list-style: none; counter-increment: paso; display: grid; grid-template-columns: 2.2rem 1fr; align-items: baseline; color: var(--crema-suave); }
+.bucle li::before { content: counter(paso); font-family: var(--titulo); color: var(--ambar); font-size: 1.2rem; }
+.bucle strong { color: var(--crema); font-weight: 600; }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { font-family: var(--etiqueta); font-weight: 400; font-size: 1.1rem; letter-spacing: 0.05em; color: var(--crema-suave); text-align: left; border-bottom: 1px solid var(--borde); padding: 0.3rem 0.5rem; }
+td { padding: 0.45rem 0.5rem; border-bottom: 1px solid rgba(241, 228, 200, 0.07); color: var(--crema-suave); }
+td:first-child { color: var(--crema); }
+td.num { font-variant-numeric: tabular-nums; text-align: right; font-family: var(--codigo); }
+th.num { text-align: right; }
+
+/* ---------- Catalogo ---------- */
+pre { font-family: var(--codigo); font-size: 0.85rem; line-height: 1.55; background: #0a1215; border: 1px solid var(--borde); border-radius: 6px; padding: 1rem 1.1rem; overflow-x: auto; color: var(--crema-suave); }
+.k { color: var(--menta); } .s { color: var(--ambar); } .n { color: var(--ladrillo-claro); } .c { color: #6f8790; }
+.error { margin-top: 0.8rem; font-family: var(--codigo); font-size: 0.85rem; background: rgba(181, 72, 58, 0.14); border: 1px solid rgba(208, 101, 79, 0.45); color: var(--crema); border-radius: 6px; padding: 0.7rem 0.9rem; overflow-x: auto; }
+.error b { color: var(--ladrillo-claro); font-weight: 400; }
+
+/* ---------- UML ---------- */
+.uml { background: #0a1215; border: 1px solid var(--borde); border-radius: 6px; padding: 1rem; overflow: auto; max-height: 72vh; }
+.uml pre.mermaid { background: none; border: 0; padding: 0; margin: 0; color: transparent; font-size: 0; display: flex; justify-content: center; }
+.uml pre.mermaid[data-processed] { color: inherit; font-size: 1rem; }
+.uml svg { max-width: 100%; max-height: 64vh; width: auto !important; height: auto; }
+.uml { cursor: zoom-in; position: relative; }
+.uml::after { content: "Clic para ampliar"; position: absolute; top: 8px; right: 10px; font-family: var(--etiqueta); font-size: 0.95rem; color: var(--crema-suave); opacity: 0.7; pointer-events: none; }
+.uml.ampliado { position: fixed; inset: 0; z-index: 30; max-height: none; border-radius: 0; cursor: zoom-out; display: flex; align-items: center; justify-content: center; padding: 2.5rem; background: rgba(10, 18, 21, 0.97); }
+.uml.ampliado::after { content: "Esc o clic para cerrar"; }
+.uml.ampliado pre.mermaid { width: 100%; height: 100%; align-items: center; }
+.uml.ampliado svg { max-width: 100% !important; max-height: 100% !important; width: 100% !important; height: 100% !important; }
+.uml-lado { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.uml-lado .tarjeta strong { color: var(--crema); font-weight: 600; }
+.arbol { font-size: 0.86rem; line-height: 1.6; white-space: pre; }
+.acciones { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; }
+.boton.secundario { background: transparent; color: var(--crema); border: 1px solid var(--crema-suave); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35); }
+
+.tabla-silabo { border: 1px solid var(--borde); border-radius: 6px; background: rgba(22, 50, 59, 0.45); padding: 0.4rem 0.6rem; overflow-x: auto; }
+.tabla-silabo td:first-child { width: 30%; font-weight: 600; }
+.tabla-silabo td { vertical-align: top; padding: 0.32rem 0.5rem; }
+
+/* ---------- Calidad ---------- */
+.cifra { font-family: var(--titulo); font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: 1; color: var(--menta); }
+.cifra small { font-size: 0.45em; color: var(--crema-suave); }
+.flujo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.6rem; font-family: var(--etiqueta); font-size: 1.2rem; }
+.rama { border: 1px solid var(--borde); border-radius: 3px; padding: 0 0.55rem; background: rgba(13, 23, 27, 0.6); }
+.rama.develop { border-color: rgba(240, 196, 106, 0.5); color: var(--ambar); }
+.rama.main { border-color: rgba(127, 209, 174, 0.5); color: var(--menta); }
+
+/* ---------- Cierre ---------- */
+.cierre .fondo { position: absolute; inset: 0; background: url("assets/fondo_clinica.png") center / cover; image-rendering: pixelated; opacity: 0.28; }
+.cierre .contenido { text-align: center; }
+.cierre .recuperados { display: flex; justify-content: center; gap: 2rem; margin: 1.5rem 0 2rem; }
+.cierre .recuperados img { width: clamp(72px, 10vw, 112px); height: auto; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.4)); }
+.boton { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--titulo); font-size: 1.1rem; text-decoration: none; color: var(--noche); background: var(--menta); padding: 0.65rem 1.3rem; border-radius: 4px; box-shadow: 0 4px 0 #4e9c7c; }
+.boton:hover { transform: translateY(1px); box-shadow: 0 3px 0 #4e9c7c; }
+.boton:focus-visible, .punto:focus-visible { outline: 2px solid var(--ambar); outline-offset: 3px; }
+
+/* ---------- Navegacion ---------- */
+.progreso { position: fixed; top: 0; left: 0; height: 3px; background: var(--ladrillo); z-index: 10; width: 0; transition: width 0.25s ease; }
+.indice { position: fixed; right: 14px; top: 50%; transform: translateY(-50%); z-index: 10; display: flex; flex-direction: column; gap: 9px; }
+.punto { width: 9px; height: 9px; border: 1px solid var(--crema-suave); background: transparent; cursor: pointer; padding: 0; }
+.punto.activo { background: var(--ladrillo-claro); border-color: var(--ladrillo-claro); }
+.contador { position: fixed; left: 16px; bottom: 14px; z-index: 10; font-family: var(--etiqueta); font-size: 1.1rem; color: var(--crema-suave); background: rgba(13, 23, 27, 0.7); padding: 0 0.5rem; border-radius: 3px; }
+
+.aparece { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.visible .aparece { opacity: 1; transform: none; }
+.visible .aparece:nth-child(2) { transition-delay: 0.06s; }
+.visible .aparece:nth-child(3) { transition-delay: 0.12s; }
+.visible .aparece:nth-child(4) { transition-delay: 0.18s; }
+.visible .aparece:nth-child(5) { transition-delay: 0.24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .aparece { opacity: 1; transform: none; transition: none; }
+}
+
+@media (max-width: 900px) {
+  .r3, .r5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ciclo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mvc, .uml-lado { grid-template-columns: 1fr; }
+  .flecha { transform: rotate(90deg); }
+  .flecha small { transform: rotate(-90deg); }
+}
+@media (max-width: 640px) {
+  html { scroll-snap-type: none; }
+  .tarjeta { overflow-x: auto; }
+  table { font-size: 0.85rem; }
+  td, th { padding: 0.35rem 0.3rem; }
+  .error { overflow-wrap: anywhere; }
+  .arbol { font-size: 0.72rem; }
+  .r2, .r3, .r5, .ciclo { grid-template-columns: 1fr; }
+  .indice { display: none; }
+  .diapositiva { min-height: auto; }
+  .portada { min-height: 100svh; }
+  .pista { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="progreso" aria-hidden="true"></div>
+<nav class="indice" aria-label="Diapositivas"></nav>
+<div class="contador" aria-hidden="true"></div>
+
+<main>
+
+<!-- 1 · Portada -->
+<section class="diapositiva portada" id="inicio" data-titulo="Portada">
+  <div class="fondo" aria-hidden="true"></div>
+  <div class="contenido">
+    <p class="seccion">UNSA · Tecnología de Objetos · Proyecto final</p>
+    <h1><img class="titulo-juego" src="assets/titulo.png" alt="Pet Survivors" width="256" height="85"></h1>
+    <p class="lema">Tras el colapso, un veterinario atiende mascotas en un consultorio improvisado y sale a buscar suministros entre animales agresivos y supervivientes hostiles.</p>
+    <div class="chips">
+      <span class="chip">C++17</span><span class="chip">raylib</span><span class="chip">MVC</span><span class="chip">5 roles</span><span class="chip">CI en Linux y Windows</span>
+    </div>
+  </div>
+  <p class="pista" aria-hidden="true">Avanza con <span class="tecla">→</span> o <span class="tecla">Espacio</span></p>
+</section>
+
+<!-- 2 · El juego -->
+<section class="diapositiva" id="juego" data-titulo="El juego">
+  <div class="contenido">
+    <p class="seccion">El juego</p>
+    <h2>Un ciclo entre la clínica y la misión</h2>
+    <p class="entrada">Cada caso es una ficha con dueño, mascota, diálogos y los suministros que hacen falta. Aceptarla abre una misión de <strong>cinco minutos</strong> con oleadas que se vuelven más densas y un arma automática.</p>
+    <div class="ciclo">
+      <div class="paso aparece"><div class="num">1</div><h3>Llegada</h3><p>El dueño y la mascota entran al consultorio. Diálogo estilo novela visual.</p></div>
+      <div class="paso aparece"><div class="num">2</div><h3>Examen</h3><p>La ficha muestra la mascota, su edad humana y los suministros pedidos.</p></div>
+      <div class="paso aparece"><div class="num">3</div><h3>Aceptar</h3><p>Se decide si atender el caso o rechazarlo.</p></div>
+      <div class="paso mision aparece"><div class="num">4</div><h3>Misión</h3><p>WASD para moverse, el arma ataca al contacto, se recogen los suministros.</p></div>
+      <div class="paso aparece"><div class="num">5</div><h3>Tratamiento</h3><p>Fundido a la clínica, diálogo final y cobro de la recompensa.</p></div>
+    </div>
+    <p class="reintento">Si se agota el reloj o la vida, el veterinario vuelve a la clínica y puede <strong>reintentar</strong> conservando la ficha. El cobro ocurre una sola vez.</p>
+  </div>
+</section>
+
+<!-- 3 · Casos -->
+<section class="diapositiva" id="casos" data-titulo="Casos">
+  <div class="contenido">
+    <p class="seccion">Casos de la demo</p>
+    <h2>Dos pacientes, dos especies</h2>
+    <p class="entrada">Las fichas viven en <code>datos/*.json</code>. Agregar otro caso solo requiere su JSON y sus imágenes: no hay que tocar código.</p>
+    <div class="rejilla r2">
+      <article class="caso aparece">
+        <div class="escena" role="img" aria-label="Elena y la gata Mora en la clínica">
+          <div class="personajes"><img class="dueno" src="assets/elena.png" alt=""><img class="mascota" src="assets/mora.png" alt=""></div>
+        </div>
+        <h3>Mora <span class="etiqueta">gata · 24 meses</span></h3>
+        <div class="suministros">
+          <span class="suministro">▪ 2 vendas</span>
+          <span class="suministro"><img src="assets/antiseptico.png" alt="">1 antiséptico</span>
+        </div>
+        <p class="dialogo">“Mora volvió del patio sin apoyar la pata.”</p>
+      </article>
+      <article class="caso aparece">
+        <div class="escena" role="img" aria-label="El dueño de Toby y el perro Toby en la clínica">
+          <div class="personajes"><img class="dueno" src="assets/dueno_toby.png" alt=""><img class="mascota" src="assets/toby.png" alt=""></div>
+        </div>
+        <h3>Toby <span class="etiqueta">perro · 48 meses</span></h3>
+        <div class="suministros">
+          <span class="suministro"><img src="assets/suero.png" alt="">1 suero</span>
+        </div>
+        <p class="dialogo">“Toby no ha levantado la cabeza desde ayer.”</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · Arquitectura -->
+<section class="diapositiva" id="arquitectura" data-titulo="Arquitectura">
+  <div class="contenido">
+    <p class="seccion">Arquitectura</p>
+    <h2>Modelo, Vista y Controlador</h2>
+    <p class="entrada">Cada parte depende de interfaces, no de implementaciones. Por eso cada rol pudo construir y probar su módulo por separado antes de integrar.</p>
+    <div class="mvc">
+      <div class="tarjeta aparece">
+        <span class="etiqueta menta">Modelo</span>
+        <h3>Reglas del juego</h3>
+        <ul><li>Catálogo de casos</li><li>Consultorio y cola propia</li><li>Mapa, misión y combate</li></ul>
+      </div>
+      <div class="flecha aparece">⇄<small>contratos</small></div>
+      <div class="tarjeta aparece">
+        <span class="etiqueta ambar">Controlador</span>
+        <h3>Coordinación</h3>
+        <ul><li>Comandos del jugador</li><li>Paso entre pantallas</li><li>Prepara <code>EstadoPantalla</code></li></ul>
+      </div>
+      <div class="flecha aparece">⇄<small>estado</small></div>
+      <div class="tarjeta aparece">
+        <span class="etiqueta">Vista</span>
+        <h3>raylib</h3>
+        <ul><li>Lee <code>EntradaCuadro</code></li><li>Dibuja ficha, diálogo y HUD</li><li>Sonido vía Observer</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UML · MVC -->
+<section class="diapositiva" id="uml-mvc" data-titulo="UML: MVC">
+  <div class="contenido">
+    <p class="seccion">UML · Diagrama de clases</p>
+    <h2>MVC con Command y Observer</h2>
+    <div class="uml-lado">
+      <div class="uml aparece"><pre class="mermaid">
+classDiagram
+  direction TB
+  class Vista {
+    &lt;&lt;interface&gt;&gt;
+    +leer_entrada() EntradaCuadro
+    +dibujar(estado: EstadoPantalla)
+  }
+  class AccionesControlador {
+    &lt;&lt;interface&gt;&gt;
+    +examinar_mascota()
+    +aceptar_caso()
+    +rechazar_caso()
+    +reintentar_mision()
+    +avanzar_dialogo()
+    +alternar_menu()
+  }
+  class Controlador {
+    &lt;&lt;interface&gt;&gt;
+    +actualizar(entrada, segundos)
+    +estado_pantalla() EstadoPantalla
+  }
+  class Comando {
+    &lt;&lt;interface&gt;&gt;
+    +ejecutar(receptor: AccionesControlador)
+  }
+  class Consultorio {
+    &lt;&lt;interface&gt;&gt;
+    +aceptar() PropuestaMision
+    +registrar_resultado(resultado)
+  }
+  class Mision {
+    &lt;&lt;interface&gt;&gt;
+    +iniciar(propuesta)
+    +extraer_resultado() ResultadoMision
+    +suscribir(receptor)
+  }
+  class ReceptorEventosMision {
+    &lt;&lt;interface&gt;&gt;
+    +suministro_recogido(suministro)
+    +intento_finalizado(desenlace)
+  }
+  AccionesControlador &lt;|-- Controlador
+  Comando ..&gt; AccionesControlador : ejecuta
+  Vista ..&gt; EstadoPantalla : dibuja
+  Controlador ..&gt; EstadoPantalla : prepara
+  Controlador ..&gt; Consultorio : gestiona el caso
+  Controlador ..&gt; Mision : coordina el intento
+  Mision ..&gt; ReceptorEventosMision : notifica
+</pre></div>
+      <div class="tarjeta aparece">
+        <h3>Cómo leerlo</h3>
+        <ul>
+          <li><strong>Command:</strong> cada botón es un <code>Comando</code> que llama a una acción del controlador. La vista nunca toca el modelo.</li>
+          <li><strong>Herencia de interfaz:</strong> <code>Controlador</code> extiende <code>AccionesControlador</code>, el receptor de los comandos.</li>
+          <li><strong>Observer:</strong> la misión notifica a quien se suscriba a <code>ReceptorEventosMision</code>, como la vista para el sonido.</li>
+          <li>Las flechas punteadas son <em>dependencias</em>: se usan los contratos, no las clases concretas.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UML · Estados -->
+<section class="diapositiva" id="uml-estados" data-titulo="UML: estados">
+  <div class="contenido">
+    <p class="seccion">UML · Diagrama de estados</p>
+    <h2>Las fases que recorre la pantalla</h2>
+    <div class="uml-lado">
+      <div class="uml aparece"><pre class="mermaid">
+stateDiagram-v2
+  direction TB
+  [*] --> portada
+  portada --> llegada : Jugar
+  llegada --> por_examinar : avanzar diálogo
+  por_examinar --> resultado_examen : examinar
+  resultado_examen --> aceptacion : aceptar
+  resultado_examen --> rechazo : rechazar
+  rechazo --> llegada : siguiente caso
+  aceptacion --> jugando : inicia misión
+  jugando --> regresando : fin del intento
+  regresando --> tratamiento : completada
+  regresando --> fallo : sin vida o sin tiempo
+  fallo --> reintento : reintentar
+  reintento --> jugando
+  tratamiento --> llegada : cobra y sigue
+  tratamiento --> sin_casos : cola vacía
+  sin_casos --> [*]
+</pre></div>
+      <div class="tarjeta aparece">
+        <h3><code>FasePantalla</code></h3>
+        <p>El controlador mantiene la fase actual y decide qué acciones están disponibles en cada una.</p>
+        <ul>
+          <li><code>regresando</code> es el fundido a negro de vuelta a la clínica.</li>
+          <li>Un <code>fallo</code> conserva la ficha: el reintento reinicia vida, enemigos, suministros y reloj.</li>
+          <li>La recompensa se cobra una sola vez, en <code>tratamiento</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Organizacion -->
+<section class="diapositiva" id="organizacion" data-titulo="Organización">
+  <div class="contenido">
+    <p class="seccion">Organización del código</p>
+    <h2>Una carpeta por responsabilidad</h2>
+    <div class="rejilla r2">
+<pre class="arbol aparece"><span class="k">src/</span>
+├─ <span class="k">modelo/</span>
+│  ├─ <span class="k">catalogo/</span>        <span class="c">fichas, JSON · rol 3</span>
+│  │  ├─ <span class="k">json/</span>          <span class="c">lector propio</span>
+│  │  └─ <span class="k">mascota/</span>       <span class="c">Mascota, Gato, Perro, fábrica</span>
+│  ├─ <span class="k">clinica/</span>         <span class="c">cola y consultorio · rol 1</span>
+│  └─ <span class="k">mision/</span>          <span class="c">reloj y recolección · rol 2</span>
+│     ├─ <span class="k">mapa/</span>          <span class="c">terreno y oleadas · rol 2</span>
+│     └─ <span class="k">combate/</span>       <span class="c">veterinario · rol 4</span>
+│        ├─ <span class="k">arma/</span>
+│        └─ <span class="k">enemigo/</span>    <span class="c">estrategias y fábrica</span>
+├─ <span class="k">controlador/</span>       <span class="c">comandos y fases · rol 5</span>
+└─ <span class="k">vista/</span>             <span class="c">raylib · rol 5</span>
+<span class="k">datos/</span>                <span class="c">una ficha JSON por caso</span>
+<span class="k">arte/</span>                 <span class="c">PNG, fuentes y prompts</span>
+<span class="k">pruebas/</span>              <span class="c">pruebas en consola y CI</span></pre>
+      <div class="tarjeta aparece">
+        <h3>Contratos entre roles</h3>
+        <table style="margin-top:0.4rem">
+          <thead><tr><th>De → a</th><th>Contrato</th></tr></thead>
+          <tbody>
+            <tr><td>Catálogo → consultorio</td><td><code>CargaCasos</code></td></tr>
+            <tr><td>Consultorio → misión</td><td><code>PropuestaMision</code></td></tr>
+            <tr><td>Mapa → combate</td><td><code>Terreno</code>, <code>Aparicion</code></td></tr>
+            <tr><td>Combate → misión</td><td><code>EstadoCombate</code></td></tr>
+            <tr><td>Misión → consultorio</td><td><code>ResultadoMision</code></td></tr>
+            <tr><td>Controlador ↔ vista</td><td><code>EntradaCuadro</code>, <code>EstadoPantalla</code></td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:0.8rem">Cada contrato es una cabecera <code>.h</code> acordada al inicio. Las familias de clases tienen su propia subcarpeta.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · Equipo -->
+<section class="diapositiva" id="equipo" data-titulo="Equipo">
+  <div class="contenido">
+    <p class="seccion">Equipo</p>
+    <h2>Cinco roles, una base común</h2>
+    <p class="entrada">El proyecto se repartió por módulos con contratos C++ definidos desde el inicio. Cada integración entra a <code>develop</code> por pull request.</p>
+    <div class="rejilla r5">
+      <article class="tarjeta rol aparece"><div class="numero">1</div><h3>Consultorio</h3><p class="quien">Dai</p><p>Cola de casos, caso activo, reintento, tratamiento y cobro.</p></article>
+      <article class="tarjeta rol aparece"><div class="numero">2</div><h3>Mapa y misión</h3><p class="quien">Mariana Yucra</p><p>Terreno, obstáculos, oleadas, reloj, recolección y resultado.</p></article>
+      <article class="tarjeta rol mia aparece"><div class="numero">3</div><h3>Catálogo</h3><p class="quien">Edson Subia</p><p>Carga y validación de fichas JSON, mascotas y su fábrica.</p></article>
+      <article class="tarjeta rol mia aparece"><div class="numero">4</div><h3>Combate</h3><p class="quien">Edson Subia</p><p>Veterinario, arma, enemigos, colisiones y daño.</p></article>
+      <article class="tarjeta rol aparece"><div class="numero">5</div><h3>Controlador y vista</h3><p class="quien">Sandra Aliaga</p><p>Pantallas, HUD, pausa, integración, CI y base del proyecto.</p></article>
+    </div>
+    <p class="nota">El arte pixel (personajes, escenarios y sprites) es de Camila Alarico y Sandra Aliaga.</p>
+  </div>
+</section>
+
+<!-- 6 · Patrones -->
+<section class="diapositiva" id="patrones" data-titulo="Patrones">
+  <div class="contenido">
+    <p class="seccion">Diseño orientado a objetos</p>
+    <h2>Patrones donde resuelven algo</h2>
+    <p class="entrada">Cada patrón responde a un cambio que esperábamos: nuevas acciones, nuevas mascotas, nuevos enemigos o una vista que reacciona a eventos.</p>
+    <div class="rejilla r2">
+      <article class="tarjeta patron aparece"><h3>Command</h3><p>Examinar, aceptar, rechazar, reintentar, avanzar diálogo y abrir el menú son objetos que el controlador ejecuta.</p><div class="clases"><code>Comando</code><code>AccionesControlador</code></div></article>
+      <article class="tarjeta patron aparece"><h3>Factory</h3><p>La especie de la ficha decide si se crea un gato o un perro; el tipo de aparición decide qué enemigo nace.</p><div class="clases"><code>FabricaMascotasBase</code><code>FabricaEnemigosBase</code></div></article>
+      <article class="tarjeta patron aparece"><h3>Strategy</h3><p>Un enemigo no sabe cómo moverse: delega en su estrategia. Un comportamiento nuevo es una clase nueva.</p><div class="clases"><code>PerseguirPorContacto</code><code>AtacarADistancia</code></div></article>
+      <article class="tarjeta patron aparece"><h3>Observer</h3><p>La misión avisa al recoger un suministro o al terminar el intento, y la vista reproduce el sonido.</p><div class="clases"><code>ReceptorEventosMision</code></div></article>
+    </div>
+    <p class="nota"><strong>SOLID:</strong> el consultorio no conoce el formato JSON, planificar oleadas y ejecutar el combate son responsabilidades distintas, y el catálogo recibe la fábrica de mascotas por inyección.</p>
+  </div>
+</section>
+
+<!-- Silabo -->
+<section class="diapositiva" id="silabo" data-titulo="Temas del curso">
+  <div class="contenido">
+    <p class="seccion">Tecnología de Objetos · 1703240</p>
+    <h2>Los temas del sílabo, en el código</h2>
+    <p class="entrada">Cada tema del curso tiene un lugar concreto en el proyecto. Lo que no aparece es porque este diseño no lo necesita.</p>
+    <div class="tabla-silabo aparece">
+      <table>
+        <thead><tr><th>Tema del sílabo</th><th>Dónde está en el proyecto</th></tr></thead>
+        <tbody>
+          <tr><td>C++ moderno, Qt y Git</td><td>C++17, proyecto <code>veterinaria.pro</code> para Qt Creator, ramas <code>feat/*</code> → <code>develop</code> → <code>main</code> con PR y CI</td></tr>
+          <tr><td>Cohesión, acoplamiento, verificabilidad</td><td>Un módulo por rol, unido solo por contratos <code>.h</code>; cada módulo tiene su prueba en consola</td></tr>
+          <tr><td>Clases, constructores y destructores</td><td><code>explicit</code> en constructores de un argumento, destructores virtuales <code>= default</code>, copia eliminada en <code>ColaCasosClinicos</code></td></tr>
+          <tr><td>Punteros y smart pointers</td><td><code>std::unique_ptr</code> para toda la propiedad; <code>Nodo*</code> solo observa el último nodo de la cola</td></tr>
+          <tr><td>Herencia, polimorfismo, clases abstractas</td><td><code>Mascota</code> abstracta con <code>Gato</code> y <code>Perro</code>; interfaces puras como <code>Combate</code>, <code>Arma</code>, <code>Enemigo</code></td></tr>
+          <tr><td>Paso por valor / referencia, <code>const</code>, <code>static</code>, <code>inline</code>, lambdas</td><td>Fichas por valor con <code>std::move</code>, <code>const&amp;</code> en lecturas, <code>FabricaEnemigosBase::perfil</code> estático, <code>edad_mascota</code> inline, lambdas en <code>sort</code> y <code>remove_if</code></td></tr>
+          <tr><td>Namespaces, convenciones, getters</td><td><code>veterinaria</code> y <code>veterinaria::json</code>, atributos con sufijo <code>_</code>, getters <code>const</code> como <code>ficha()</code> y <code>vida()</code></td></tr>
+          <tr><td>UML, errores y excepciones</td><td>Diagramas de clases, estados y secuencia; <code>ErrorJson</code> hereda de <code>std::runtime_error</code>; errores de carga por archivo sin detener el juego</td></tr>
+          <tr><td>STL y templates</td><td><code>vector</code>, <code>set</code>, <code>optional</code>, <code>filesystem</code>, <code>&lt;algorithm&gt;</code>; plantilla <code>barajar&lt;T&gt;</code> en el planificador</td></tr>
+          <tr><td>Patrones creacionales y MVC</td><td><strong>Factory</strong> (lab 8) para mascotas y enemigos; además Strategy, Command y Observer, dentro de una arquitectura <strong>MVC</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota">No usamos hilos, Builder, Singleton ni Prototype: el bucle del juego corre en un solo hilo y ningún objeto necesita una instancia global o clonarse.</p>
+  </div>
+</section>
+
+<!-- UML · Datos -->
+<section class="diapositiva" id="uml-datos" data-titulo="UML: datos">
+  <div class="contenido">
+    <p class="seccion">UML · Modelo de datos</p>
+    <h2>Ficha, cola y objetivo de misión</h2>
+    <div class="uml-lado">
+      <div class="uml aparece"><pre class="mermaid">
+classDiagram
+  direction TB
+  class CasoClinico {
+    +id: string
+    +recompensa: int
+  }
+  class FichaMascota {
+    +nombre: string
+    +especie: string
+    +edad_meses: int
+    +retrato: string
+  }
+  class FichaDueno {
+    +nombre: string
+    +sprite: string
+  }
+  class DialogosCaso {
+    +llegada
+    +aceptacion
+    +rechazo
+    +fallo
+    +tratamiento
+  }
+  class LineaDialogo {
+    +hablante: Hablante
+    +texto: string
+  }
+  class CantidadSuministro {
+    +id: string
+    +cantidad: int
+  }
+  class ColaCasosClinicos {
+    -primero_: unique_ptr~Nodo~
+    -ultimo_: Nodo*
+    +encolar(caso)
+    +extraer() CasoClinico
+  }
+  class Nodo {
+    -caso: CasoClinico
+    -siguiente: unique_ptr~Nodo~
+  }
+  class PropuestaMision {
+    +id_caso: string
+    +limite_segundos: int
+  }
+  CasoClinico "1" *-- "1" FichaMascota
+  CasoClinico "1" *-- "1" FichaDueno
+  CasoClinico "1" *-- "1" DialogosCaso
+  DialogosCaso "1" *-- "0..*" LineaDialogo
+  CasoClinico "1" *-- "1..*" CantidadSuministro : solicita
+  ColaCasosClinicos "1" *-- "0..1" Nodo : primero
+  Nodo "1" *-- "0..1" Nodo : siguiente
+  Nodo "1" *-- "1" CasoClinico
+  PropuestaMision "1" *-- "1..*" CantidadSuministro : requiere
+</pre></div>
+      <div class="tarjeta aparece">
+        <h3>Composición</h3>
+        <ul>
+          <li>El rombo lleno indica que el caso <strong>posee</strong> sus partes: se copian y se destruyen con él.</li>
+          <li>La cola es una <strong>lista enlazada propia</strong>: <code>primero_</code> es dueño del primer nodo y cada nodo del siguiente; <code>ultimo_</code> solo observa, para encolar en tiempo constante.</li>
+          <li><code>CantidadSuministro</code> se comparte entre ficha, objetivo, inventario y resultado, así todos usan los mismos identificadores.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UML · Combate -->
+<section class="diapositiva" id="uml-combate" data-titulo="UML: combate">
+  <div class="contenido">
+    <p class="seccion">UML · Rol 4</p>
+    <h2>Combate: herencia, Strategy y Factory</h2>
+    <div class="rejilla r2">
+    <div class="uml aparece"><pre class="mermaid">
+classDiagram
+  direction TB
+  class Combate {
+    &lt;&lt;interface&gt;&gt;
+    +iniciar(terreno)
+    +agregar_enemigo(aparicion)
+    +actualizar(direccion, segundos)
+    +estado() EstadoCombate
+  }
+  class CombateBase {
+    -configuracion_: ConfiguracionCombate
+    -enemigos_: vector~EnemigoActivo~
+    -proyectiles_: vector~Proyectil~
+    -resolver_movimiento(desde, avance, radio) Punto
+    -atacar_con_arma()
+  }
+  class VeterinarioJugable {
+    -posicion_: Punto
+    -vida_: int
+    +mover_a(posicion)
+    +recibir_danio(cantidad)
+  }
+  class Arma {
+    &lt;&lt;interface&gt;&gt;
+    +alcance() float
+    +intentar_atacar() int
+  }
+  class ArmaBase {
+    -danio_: int
+    -intervalo_entre_ataques_: float
+  }
+  class FabricaEnemigos {
+    &lt;&lt;interface&gt;&gt;
+    +crear(aparicion) unique_ptr~Enemigo~
+  }
+  Combate &lt;|.. CombateBase
+  Arma &lt;|.. ArmaBase
+  CombateBase "1" *-- "1" VeterinarioJugable
+  CombateBase "1" *-- "1" Arma : unique_ptr
+  CombateBase "1" *-- "1" FabricaEnemigos : unique_ptr
+</pre></div>
+    <div class="uml aparece"><pre class="mermaid">
+classDiagram
+  direction TB
+  class FabricaEnemigos {
+    &lt;&lt;interface&gt;&gt;
+  }
+  class FabricaEnemigosBase {
+    +perfil(tipo)$ PerfilEnemigo
+  }
+  class Enemigo {
+    &lt;&lt;interface&gt;&gt;
+    +decidir(jugador, segundos) IntencionEnemigo
+    +recibir_danio(cantidad)
+  }
+  class EnemigoConEstrategia {
+    -estado_: EstadoEnemigo
+  }
+  class EstrategiaEnemigo {
+    &lt;&lt;interface&gt;&gt;
+    +decidir(enemigo, jugador, segundos)
+  }
+  class PerseguirPorContacto
+  class AtacarADistancia {
+    -alcance_: float
+    -segundos_para_disparar_: float
+  }
+  FabricaEnemigos &lt;|.. FabricaEnemigosBase
+  FabricaEnemigosBase ..&gt; EnemigoConEstrategia : crea
+  Enemigo &lt;|.. EnemigoConEstrategia
+  EnemigoConEstrategia "1" *-- "1" EstrategiaEnemigo : unique_ptr
+  EstrategiaEnemigo &lt;|.. PerseguirPorContacto
+  EstrategiaEnemigo &lt;|.. AtacarADistancia
+</pre></div>
+    </div>
+    <p class="nota">Toda la propiedad se expresa con <code>std::unique_ptr</code>: no hay <code>new</code> ni <code>delete</code> manuales. Agregar un enemigo con otro comportamiento es crear una nueva <code>EstrategiaEnemigo</code> y una línea en la fábrica.</p>
+  </div>
+</section>
+
+<!-- 7 · Combate -->
+<section class="diapositiva" id="combate" data-titulo="Combate">
+  <div class="contenido">
+    <p class="seccion">Rol 4 · Combate</p>
+    <h2>Qué pasa en cada cuadro</h2>
+    <div class="rejilla r2">
+      <div class="tarjeta aparece">
+        <h3><code>CombateBase::actualizar()</code></h3>
+        <ol class="bucle" style="margin-top:0.7rem">
+          <li><span>Divide el tiempo en pasos de <strong>0,05 s</strong> para que nada atraviese obstáculos.</span></li>
+          <li><span>Mueve al veterinario <strong>eje por eje</strong> contra límites y rectángulos de colisión: se desliza junto a las rocas.</span></li>
+          <li><span>Cada enemigo pide su intención a su <strong>estrategia</strong> y se mueve.</span></li>
+          <li><span>Aplica el daño por contacto con recarga y avanza los <strong>proyectiles</strong>.</span></li>
+          <li><span>El arma golpea solo al <strong>enemigo más cercano</strong>, uno por intervalo.</span></li>
+          <li><span>Retira a los eliminados y publica <code>EstadoCombate</code> para la vista.</span></li>
+        </ol>
+      </div>
+      <div class="tarjeta aparece">
+        <h3>Enemigos</h3>
+        <table style="margin-top:0.5rem">
+          <thead><tr><th>Tipo</th><th class="num">Vida</th><th class="num">Vel.</th><th class="num">Daño</th></tr></thead>
+          <tbody>
+            <tr><td>Animal de contacto</td><td class="num">30</td><td class="num">90</td><td class="num">10</td></tr>
+            <tr><td>Superviviente de contacto</td><td class="num">60</td><td class="num">60</td><td class="num">15</td></tr>
+            <tr><td>Superviviente a distancia</td><td class="num">40</td><td class="num">50</td><td class="num">8</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:0.9rem">El superviviente a distancia se acerca hasta 220 px, retrocede si lo arrinconan y dispara cada 2 s. El arma básica hace 10 de daño cada 0,5 s.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UML · Secuencia -->
+<section class="diapositiva" id="uml-secuencia" data-titulo="UML: secuencia">
+  <div class="contenido">
+    <p class="seccion">UML · Diagrama de secuencia</p>
+    <h2>Un cuadro de la misión, de la tecla al dibujo</h2>
+    <div class="uml aparece"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant V as Vista
+  participant C as Controlador
+  participant M as MisionBase
+  participant P as PlanificadorMapa
+  participant K as CombateBase
+  participant E as Enemigo
+  participant R as ReceptorEventosMision
+  V->>C: actualizar(entrada, segundos)
+  C->>M: actualizar(direccion, segundos)
+  M->>P: avanzar(segundos)
+  P-->>M: apariciones
+  loop cada aparición
+    M->>K: agregar_enemigo(aparicion)
+  end
+  M->>K: actualizar(direccion, segundos)
+  loop cada enemigo
+    K->>E: decidir(jugador, segundos)
+    E-->>K: IntencionEnemigo
+  end
+  K-->>M: estado() con vida y posiciones
+  alt el veterinario toca un suministro
+    M->>R: suministro_recogido(suministro)
+  end
+  C-->>V: estado_pantalla()
+  V->>V: dibujar(estado)
+</pre></div>
+  </div>
+</section>
+
+<!-- UML · Catalogo -->
+<section class="diapositiva" id="uml-catalogo" data-titulo="UML: catálogo">
+  <div class="contenido">
+    <p class="seccion">UML · Rol 3</p>
+    <h2>Catálogo y mascotas: polimorfismo e inyección</h2>
+    <div class="uml-lado">
+      <div class="uml aparece"><pre class="mermaid">
+classDiagram
+  direction TB
+  class CatalogoCasos {
+    &lt;&lt;interface&gt;&gt;
+    +cargar(directorio) CargaCasos
+  }
+  class CatalogoCasosJson {
+    -fabrica_: const FabricaMascotas&amp;
+    +interpretar(texto) CasoClinico
+  }
+  class FabricaMascotas {
+    &lt;&lt;interface&gt;&gt;
+    +crear(ficha) unique_ptr~Mascota~
+  }
+  class FabricaMascotasBase
+  class Mascota {
+    &lt;&lt;abstract&gt;&gt;
+    -ficha_: FichaMascota
+    +ficha() FichaMascota
+    +calcularEdadHumana()* double
+  }
+  class Gato {
+    +calcularEdadHumana() double
+  }
+  class Perro {
+    +calcularEdadHumana() double
+  }
+  class CargaCasos {
+    +casos: vector~CasoClinico~
+    +errores: vector~ErrorCargaCaso~
+  }
+  class ValorJson {
+    +tipo() TipoJson
+    +buscar(clave) ValorJson*
+  }
+  CatalogoCasos &lt;|.. CatalogoCasosJson
+  FabricaMascotas &lt;|.. FabricaMascotasBase
+  Mascota &lt;|-- Gato
+  Mascota &lt;|-- Perro
+  CatalogoCasosJson o-- FabricaMascotas : inyectada
+  CatalogoCasosJson ..&gt; ValorJson : lee
+  CatalogoCasosJson ..&gt; CargaCasos : devuelve
+  FabricaMascotasBase ..&gt; Gato : crea
+  FabricaMascotasBase ..&gt; Perro : crea
+</pre></div>
+      <div class="tarjeta aparece">
+        <h3>Decisiones</h3>
+        <ul>
+          <li><code>Mascota</code> es abstracta: <code>calcularEdadHumana()</code> es virtual pura y cada especie la redefine.</li>
+          <li>El catálogo <strong>recibe</strong> la fábrica (agregación, rombo vacío). Admitir otra especie no cambia el catálogo: principio abierto/cerrado.</li>
+          <li>Cada error de una ficha se guarda en <code>CargaCasos::errores</code> con su archivo, en lugar de detener la carga.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · Catalogo -->
+<section class="diapositiva" id="catalogo" data-titulo="Catálogo">
+  <div class="contenido">
+    <p class="seccion">Rol 3 · Catálogo</p>
+    <h2>Del JSON a la ficha, con errores útiles</h2>
+    <p class="entrada">Un lector JSON propio, sin dependencias, alimenta a <code>CatalogoCasosJson</code>. Una ficha mal escrita se informa con su archivo y su campo, y las demás se cargan igual.</p>
+    <div class="rejilla r2">
+      <div class="aparece">
+<pre><span class="c">// datos/02_toby.json</span>
+{
+  <span class="k">"id"</span>: <span class="s">"caso_toby"</span>,
+  <span class="k">"mascota"</span>: { <span class="k">"especie"</span>: <span class="s">"perro"</span>, <span class="k">"edad_meses"</span>: <span class="n">48</span>, … },
+  <span class="k">"suministros"</span>: [
+    { <span class="k">"id"</span>: <span class="s">"suero"</span>, <span class="k">"cantidad"</span>: <span class="n">0</span> }
+  ],
+  <span class="k">"recompensa"</span>: <span class="n">25</span>
+}</pre>
+        <div class="error"><b>03_rex.json</b> → suministros[0].cantidad: debe ser un entero mayor o igual a 1</div>
+      </div>
+      <div class="tarjeta aparece">
+        <h3>Edad humana por especie</h3>
+        <table style="margin-top:0.5rem">
+          <thead><tr><th>Edad</th><th class="num">Gato</th><th class="num">Perro</th></tr></thead>
+          <tbody>
+            <tr><td>Primer año</td><td class="num">15</td><td class="num">15</td></tr>
+            <tr><td>Segundo año</td><td class="num">+9</td><td class="num">+9</td></tr>
+            <tr><td>Cada año siguiente</td><td class="num">+4</td><td class="num">+5</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:0.9rem"><code>Gato</code> y <code>Perro</code> redefinen <code>calcularEdadHumana()</code>; el controlador la llama a través de <code>std::unique_ptr&lt;Mascota&gt;</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · Calidad -->
+<section class="diapositiva" id="calidad" data-titulo="Calidad">
+  <div class="contenido">
+    <p class="seccion">Cómo trabajamos</p>
+    <h2>Cada cambio pasa por pruebas y revisión</h2>
+    <div class="rejilla r3" style="margin-bottom:1rem">
+      <div class="tarjeta aparece"><div class="cifra">38</div><p>comprobaciones del mapa y las oleadas</p></div>
+      <div class="tarjeta aparece"><div class="cifra">33</div><p>comprobaciones del combate</p></div>
+      <div class="tarjeta aparece"><div class="cifra">42</div><p>comprobaciones del catálogo y las mascotas</p></div>
+    </div>
+    <div class="rejilla r2">
+      <div class="tarjeta aparece">
+        <h3>Integración continua</h3>
+        <ul>
+          <li>Compila cada cabecera con <code>-Wall -Wextra -Werror</code> en Linux y Windows.</li>
+          <li>Valida las fichas JSON y los README.</li>
+          <li>clang-format en un hook local y en CI, con parche automático.</li>
+        </ul>
+      </div>
+      <div class="tarjeta aparece">
+        <h3>Flujo de ramas</h3>
+        <div class="flujo"><span class="rama">feat/*</span>→<span class="rama develop">develop</span>→<span class="rama main">main</span></div>
+        <p style="margin-top:0.7rem">PR pequeños y encadenados: cada uno agrega una pieza que se revisa sola. <code>develop</code> publica el canal staging y <code>main</code> el de producción.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · Cierre -->
+<section class="diapositiva cierre" id="cierre" data-titulo="Cierre">
+  <div class="fondo" aria-hidden="true"></div>
+  <div class="contenido">
+    <p class="seccion" style="justify-content:center">Próximos pasos</p>
+    <h2>Integrar todo y atender a Mora y Toby</h2>
+    <p class="entrada" style="margin-left:auto;margin-right:auto">Conectar consultorio, catálogo, misión y combate en la partida final, colocar los sprites de misión y sumar la ráfaga de rayos del vigía.</p>
+    <div class="recuperados" aria-hidden="true">
+      <img src="assets/mora_relajada.png" alt="" width="64" height="64">
+      <img src="assets/toby_recuperado.png" alt="" width="64" height="64">
+    </div>
+    <div class="acciones">
+      <a class="boton" href="https://github.com/sandra-aliaga/veterinaria-apocaliptica-to" target="_blank" rel="noopener">Ver el repositorio</a>
+      <a class="boton secundario" href="assets/uml_veterinaria.pdf" target="_blank" rel="noopener">UML completo (PDF)</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+if (window.mermaid) {
+  mermaid.initialize({
+    startOnLoad: true,
+    securityLevel: "strict",
+    theme: "base",
+    themeVariables: {
+      darkMode: true,
+      background: "#0a1215",
+      fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+      fontSize: "15px",
+      primaryColor: "#16323b",
+      primaryTextColor: "#f1e4c8",
+      primaryBorderColor: "#7fd1ae",
+      secondaryColor: "#234855",
+      tertiaryColor: "#0d171b",
+      lineColor: "#c9bfa8",
+      textColor: "#f1e4c8",
+      mainBkg: "#16323b",
+      nodeBorder: "#7fd1ae",
+      clusterBkg: "#0d171b",
+      actorBkg: "#16323b",
+      actorBorder: "#7fd1ae",
+      actorTextColor: "#f1e4c8",
+      actorLineColor: "#5d7881",
+      signalColor: "#c9bfa8",
+      signalTextColor: "#f1e4c8",
+      labelBoxBkgColor: "#b5483a",
+      labelBoxBorderColor: "#d0654f",
+      labelTextColor: "#f1e4c8",
+      loopTextColor: "#f0c46a",
+      activationBkgColor: "#234855",
+      noteBkgColor: "#234855",
+      noteTextColor: "#f1e4c8",
+      sequenceNumberColor: "#0d171b",
+      transitionColor: "#c9bfa8",
+      transitionLabelColor: "#c9bfa8",
+      stateLabelColor: "#f1e4c8",
+      stateBkg: "#16323b",
+      altBackground: "#0d171b"
+    },
+    classDiagram: { useMaxWidth: true },
+    sequence: { useMaxWidth: true, mirrorActors: false },
+    state: { useMaxWidth: true }
+  });
+}
+</script>
+<script>
+(function () {
+  var diapositivas = Array.prototype.slice.call(document.querySelectorAll(".diapositiva"));
+  var indice = document.querySelector(".indice");
+  var progreso = document.querySelector(".progreso");
+  var contador = document.querySelector(".contador");
+  var actual = 0;
+
+  diapositivas.forEach(function (diapositiva, i) {
+    var punto = document.createElement("button");
+    punto.className = "punto";
+    punto.type = "button";
+    punto.setAttribute("aria-label", (i + 1) + ". " + diapositiva.dataset.titulo);
+    punto.addEventListener("click", function () { ir(i); });
+    indice.appendChild(punto);
+  });
+  var puntos = indice.querySelectorAll(".punto");
+
+  function marcar(i) {
+    actual = i;
+    puntos.forEach(function (p, j) { p.classList.toggle("activo", j === i); });
+    progreso.style.width = ((i + 1) / diapositivas.length * 100) + "%";
+    contador.textContent = (i + 1) + " / " + diapositivas.length;
+  }
+
+  function ir(i) {
+    i = Math.max(0, Math.min(diapositivas.length - 1, i));
+    diapositivas[i].scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  var observador = new IntersectionObserver(function (entradas) {
+    entradas.forEach(function (entrada) {
+      if (entrada.isIntersecting) {
+        entrada.target.classList.add("visible");
+        if (entrada.intersectionRatio >= 0.5) {
+          marcar(diapositivas.indexOf(entrada.target));
+        }
+      }
+    });
+  }, { threshold: [0.01, 0.5] });
+  diapositivas.forEach(function (d) { observador.observe(d); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey || document.querySelector(".uml.ampliado")) { return; }
+    if (["ArrowRight", "ArrowDown", "PageDown", " "].indexOf(e.key) >= 0) {
+      e.preventDefault(); ir(actual + 1);
+    } else if (["ArrowLeft", "ArrowUp", "PageUp"].indexOf(e.key) >= 0) {
+      e.preventDefault(); ir(actual - 1);
+    } else if (e.key === "Home") {
+      e.preventDefault(); ir(0);
+    } else if (e.key === "End") {
+      e.preventDefault(); ir(diapositivas.length - 1);
+    }
+  });
+
+  document.querySelectorAll(".uml").forEach(function (caja) {
+    caja.setAttribute("tabindex", "0");
+    caja.setAttribute("role", "button");
+    caja.setAttribute("aria-label", "Ampliar diagrama");
+    caja.addEventListener("click", function () { caja.classList.toggle("ampliado"); });
+    caja.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { caja.classList.toggle("ampliado"); }
+    });
+  });
+  document.addEventListener("keydown", function (e) {
+    var abierto = document.querySelector(".uml.ampliado");
+    if (abierto && e.key === "Escape") { abierto.classList.remove("ampliado"); }
+  }, true);
+
+  // Mermaid cambia las alturas al dibujar: se vuelve a la diapositiva del enlace.
+  window.addEventListener("load", function () {
+    if (location.hash) {
+      setTimeout(function () {
+        var destino = document.querySelector(location.hash);
+        if (destino) { destino.scrollIntoView({ block: "start" }); }
+      }, 600);
+    }
+  });
+
+  marcar(0);
+})();
+</script>
+</body>
+</html>
